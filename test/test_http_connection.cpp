@@ -34,10 +34,13 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "setup_transfer.hpp"
 #include "test_utils.hpp"
 
+#include "libtorrent/file.hpp"
 #include "libtorrent/socket.hpp"
 #include "libtorrent/socket_io.hpp" // print_endpoint
 #include "libtorrent/http_connection.hpp"
 #include "libtorrent/resolver.hpp"
+#include "libtorrent/file.hpp"
+#include "libtorrent/aux_/storage_utils.hpp"
 
 #include <fstream>
 #include <iostream>
@@ -147,10 +150,10 @@ void write_test_file()
 	std::srand(unsigned(std::time(nullptr)));
 	std::generate(data_buffer, data_buffer + sizeof(data_buffer), &std::rand);
 	error_code ec;
-	file test_file("test_file", open_mode::write_only, ec);
+	file test_file("test_file", aux::open_mode::write, ec);
 	TEST_CHECK(!ec);
 	if (ec) std::printf("file error: %s\n", ec.message().c_str());
-	iovec_t b = { data_buffer, 3216};
+	iovec_t const b = { data_buffer, 3216};
 	test_file.writev(0, b, ec);
 	TEST_CHECK(!ec);
 	if (ec) std::printf("file error: %s\n", ec.message().c_str());
@@ -179,7 +182,7 @@ void run_suite(std::string const& protocol
 	ps.hostname = "127.0.0.1";
 	ps.username = "testuser";
 	ps.password = "testpass";
-	ps.type = proxy_type;
+	ps.type = static_cast<std::uint8_t>(proxy_type);
 
 	if (ps.type != settings_pack::none)
 		ps.port = aux::numeric_cast<std::uint16_t>(start_proxy(ps.type));
