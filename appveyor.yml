@@ -121,6 +121,8 @@ build_script:
   )
 
 test_script:
+- echo %ROOT_DIRECTPRY%
+- dir %ROOT_DIRECTORY%
 - cd %ROOT_DIRECTORY%\test
 - if defined x64 (
   appveyor-retry b2.exe -l400 --hash -j2 openssl-version=pre1.1 address-model=64 win-tests %compiler% variant=%variant% link=shared
